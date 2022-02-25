@@ -1,0 +1,34 @@
+//colors
+$pri: #ffd000;
+$sec: #ffee00;
+$black: #313131;
+$white: #fff;
+$grey: #808080;
+
+//ui colors
+$bg: #fafafa;
+$border: #e6e6e6;
+
+//text
+$base: $black;
+$sub: $grey;
+
+//notificators
+$link: #2d8cf0;
+$success: #19be6b;
+$warning: #ff9900;
+$error: #ed3f14;
+$disabled: $border;
+
+//shadows
+$shadow: 0 2px 5px 0 rgba($black, 0.2);
+$shadow-hard: 0 2px 5px 0 rgba(#000, 0.8);
+$inset: inset 0 2px 5px 0 rgba($black, 0.2);
+$inset-hard: inset 0 2px 5px 0 rgba(#000, 0.8);
+
+//media queries
+$mobile: 600px;
+$tablet: 900px;
+
+//text size
+$text: 1em;
