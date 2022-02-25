@@ -1,11 +1,10 @@
-import adapter from '@sveltejs/adapter-auto';
+import vercel from '@sveltejs/adapter-vercel';
 import preprocess from 'svelte-preprocess';
 import autoprefixer from 'autoprefixer';
 import { resolve } from 'path';
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
-
 	preprocess: preprocess({
 		scss: {
 			prependData: '@import "./src/_vars.scss";'
@@ -16,14 +15,7 @@ const config = {
 	}),
 
 	kit: {
-		adapter: adapter(),
-
-		// Override http methods in the Todo forms
-		methodOverride: {
-			allowed: ['PATCH', 'DELETE']
-		},
-
-		// Custom aliases for Vite
+		adapter: vercel(),
 		vite: {
 			resolve: {
 				alias: {
