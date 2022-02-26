@@ -1,6 +1,7 @@
 <script lang="ts">
 	import 'verdu/fonts/circular.css';
 	import 'verdu/fonts/operator.css';
+	import Nav from '$lib/Nav.svelte';
 	import { message } from '$lib/message';
 
 	console.log(
@@ -9,6 +10,8 @@
 		'font-size: 14px; font-weight: bold;'
 	);
 </script>
+
+<Nav />
 
 <main>
 	<slot />
