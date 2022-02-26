@@ -117,6 +117,14 @@ export const devices: Array<{ name: string, type: string, size: { width: number,
     }
   },
   {
+    name: 'Desktop XLarge',
+    type: 'desktop',
+    size: {
+      width: 2560,
+      height: 1440,
+    }
+  },
+  {
     name: 'Macbook Pro 14',
     type: 'desktop',
     size: {
@@ -132,14 +140,6 @@ export const devices: Array<{ name: string, type: string, size: { width: number,
       height: 1117,
     }
   },
-  {
-    name: 'Desktop XLarge',
-    type: 'desktop',
-    size: {
-      width: 2560,
-      height: 1440,
-    }
-  }
 ];
 
 

@@ -8,7 +8,7 @@
 	const desktopFilter = devices.filter((device) => device.type === 'desktop');
 	const tabletFilter = devices.filter((device) => device.type === 'tablet');
 	const mobileFilter = devices.filter((device) => device.type === 'mobile');
-	const desktopDevices = [...desktopFilter, ...tabletFilter];
+	const desktopDevices = [...desktopFilter];
 	const mobileDevices = [...mobileFilter, ...tabletFilter];
 	let desktopDeviceSelection = desktopDevices[0];
 	let mobileDeviceSelection = mobileDevices[0];
@@ -29,42 +29,73 @@
 	let desktopScale: number;
 	let mobileScale: number;
 
-	function scale(container: HTMLElement, { width, height }) {
-		const containerRatio = container.clientWidth / container.clientHeight;
-		const frameRatio = width / height;
-		const ratio = containerRatio - frameRatio;
-		const padding: number = height > width ? 270 : 150;
+	function scale(container: HTMLElement, frame: HTMLIFrameElement): number {
+		const { clientWidth: containerWidth, clientHeight: containerHeight } = container;
+		const { clientWidth: frameWidth, clientHeight: frameHeight } = frame;
 
-		if (height / ratio > container.clientHeight) {
-			return (container.clientHeight - padding) / height;
+		const containerRatio = containerWidth / containerHeight;
+		const frameRatio = frameWidth / frameHeight;
+		const ratio = containerRatio - frameRatio;
+		const padding: number = frameWidth > frameHeight ? 150 : 270;
+
+		if (viewRight) {
+			return (containerHeight - padding) / frameHeight;
 		}
 
-		return (container.clientWidth - padding) / width;
+		if (frameHeight / ratio > containerHeight) {
+			return (containerHeight - padding) / frameHeight;
+		}
+
+		return (containerWidth - padding) / frameWidth;
+	}
+
+	function rotateDevice(device) {
+		if (device === 'desktop') {
+			const { width, height } = desktopDeviceSelection.size;
+
+			desktopDeviceSelection.size = {
+				width: height,
+				height: width
+			};
+		} else {
+			const { width, height } = mobileDeviceSelection.size;
+
+			mobileDeviceSelection.size = {
+				width: height,
+				height: width
+			};
+		}
 	}
 
 	let update: Function = () => {};
 	$: if (desktop || mobile) update();
+	$: if (desktopDeviceSelection || mobileDeviceSelection) update();
 
 	onMount(() => {
 		update = () => {
-			desktopFrame.style.cssText = `
-				min-width: ${desktop.width}px;
-				max-width: ${desktop.width}px;
-				min-height: ${desktop.height}px;
-				max-height: ${desktop.height}px;
-    		transform: scale(${scale(desktopContainer, desktop)});
-  		`;
+			if (desktopFrame !== null) {
+				desktopFrame.style.cssText = `
+					min-width: ${desktop.width}px;
+					max-width: ${desktop.width}px;
+					min-height: ${desktop.height}px;
+					max-height: ${desktop.height}px;
+					transform: scale(${scale(desktopContainer, desktopFrame)});
+				`;
 
-			mobileFrame.style.cssText = `
-				min-width: ${mobile.width}px;
-				max-width: ${mobile.width}px;
-				min-height: ${mobile.height}px;	
-				max-height: ${mobile.height}px;
-				transform: scale(${scale(mobileContainer, mobile)});
-  		`;
+				desktopScale = Math.floor(scale(desktopContainer, desktopFrame) * 100) - 100;
+			}
 
-			desktopScale = Math.floor(scale(desktopContainer, desktop) * 100) - 100;
-			mobileScale = Math.floor(scale(mobileContainer, mobile) * 100) - 100;
+			if (mobileFrame !== null) {
+				mobileFrame.style.cssText = `
+					min-width: ${mobile.width}px;
+					max-width: ${mobile.width}px;
+					min-height: ${mobile.height}px;	
+					max-height: ${mobile.height}px;
+					transform: scale(${scale(mobileContainer, mobileFrame)});
+  			`;
+
+				mobileScale = Math.floor(scale(mobileContainer, mobileFrame) * 100) - 100;
+			}
 		};
 
 		update();
@@ -132,6 +163,10 @@
 				{/each}
 			</select>
 
+			<button class="rotate" on:click={() => rotateDevice('mobile')}>
+				<img src="/rotate.svg" alt="Rotate" />
+			</button>
+
 			<iframe
 				bind:this={mobileFrame}
 				width={mobileDeviceSelection.size.width}
@@ -150,13 +185,13 @@
 	.left {
 		position: relative;
 		width: 65%;
-		background: $black;
+		background: #111;
 	}
 
 	.right {
 		position: relative;
 		width: 35%;
-		background: $black;
+		background: #111;
 		box-shadow: inset 1px 0 0 0 #000;
 	}
 
@@ -169,9 +204,10 @@
 		position: absolute;
 		inset: 0 auto auto auto;
 		width: 250px;
-		color: #000;
+		background: rgba(#000, 0.6);
+		color: $border;
 		font-weight: bold;
-		text-align-last:center;
+		text-align-last: center;
 		border: 1px solid #000;
 		border-top: none;
 		border-radius: 0 0 10px 10px;
@@ -180,7 +216,22 @@
 
 		option {
 			background: $black;
-			color: $grey;
+			color: $border;
+		}
+	}
+
+	.rotate {
+		position: absolute;
+		top: 5px;
+		right: calc(50% - 160px);
+		width: 30px;
+		height: 30px;
+		padding: 2px;
+		z-index: 1;
+
+		img {
+			width: 100%;
+			height: 100%;
 		}
 	}
 
@@ -192,12 +243,12 @@
 
 		&[title='desktop'] {
 			box-shadow: 0 80px 80px -30px rgba(#000, 0.8), 0 0 0 var(--frame-with-desktop) #000,
-				0 0 0 calc(var(--frame-with-desktop) + 5px) #111;
+				0 0 0 calc(var(--frame-with-desktop) + 5px) #222;
 		}
 
 		&[title='mobile'] {
 			box-shadow: 0 60px 60px -30px rgba(#000, 0.8), 0 0 0 var(--frame-with-mobile) #000,
-				0 0 0 calc(var(--frame-with-mobile) + 3px) #111;
+				0 0 0 calc(var(--frame-with-mobile) + 3px) #222;
 		}
 	}
 
@@ -205,12 +256,15 @@
 		position: absolute;
 		inset: auto auto 0 auto;
 		width: 150px;
-		color: #000;
+		background: rgba(#000, 0.6);
+		color: $grey;
+		font-size: 12px;
+		font-weight: bold;
 		text-align: center;
 		border: 1px solid #000;
-		border-bottom: none;
 		border-radius: 10px 10px 0 0;
-		padding: 10px 20px;
+		padding: 7px 14px;
+		pointer-events: none;
 		z-index: 1;
 	}
 </style>
