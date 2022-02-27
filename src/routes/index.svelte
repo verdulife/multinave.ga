@@ -3,6 +3,7 @@
 	import { onMount } from 'svelte';
 	import { desktopDevices, mobileDevices } from '$lib/devices';
 	import { UserStore } from '$lib/stores';
+	import { browser } from '$app/env';
 
 	const port = $page.params.port || $UserStore.port;
 	const { protocol, host, defaults } = $UserStore;
@@ -10,9 +11,11 @@
 	let desktopDeviceSelection = desktopDevices[defaults.desktop];
 	let mobileDeviceSelection = mobileDevices[defaults.mobile];
 
-	let viewBoth = true;
-	let viewLeft = false;
-	let viewRight = false;
+	let viewBoth: boolean = false;
+	let viewLeft: boolean = false;
+	let viewRight: boolean = false;
+
+	$: if (browser) viewBoth = true;
 
 	let desktopContainer: HTMLElement;
 	let desktopFrame: HTMLIFrameElement;
@@ -69,6 +72,14 @@
 	$: if (desktopDeviceSelection || mobileDeviceSelection) update();
 
 	onMount(() => {
+		const isMobile = window.innerWidth <= 940;
+
+		if (isMobile) {
+			viewBoth = false;
+			viewLeft = false;
+			viewRight = true;
+		}
+
 		update = () => {
 			if (desktopFrame !== null) {
 				desktopFrame.style.cssText = `
@@ -126,10 +137,6 @@
 	});
 </script>
 
-<svelte:head>
-	<title>Multinavega 🚀</title>
-</svelte:head>
-
 <section class="row fill">
 	{#if viewLeft || viewBoth}
 		<div bind:this={desktopContainer} class="left col fcenter yfill" class:monoscreen={viewLeft}>
@@ -182,13 +189,11 @@
 	.left {
 		position: relative;
 		width: 65%;
-		background: #111;
 	}
 
 	.right {
 		position: relative;
 		width: 35%;
-		background: #111;
 		box-shadow: inset 1px 0 0 0 #000;
 	}
 
@@ -201,10 +206,11 @@
 		position: absolute;
 		inset: 0 auto auto auto;
 		width: 250px;
-		background: rgba(#000, 0.6);
-		color: $border;
+		background: rgba(#000, 0.6) url('/arrow-down.svg') no-repeat;
+		background-size: auto 40%;
+		background-position: calc(100% - 7px) center;
+		color: $sec;
 		font-weight: bold;
-		text-align-last: center;
 		border: 1px solid #000;
 		border-top: none;
 		border-radius: 0 0 10px 10px;
@@ -213,7 +219,7 @@
 
 		option {
 			background: $black;
-			color: $border;
+			color: $sec;
 		}
 	}
 

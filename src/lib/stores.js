@@ -8,7 +8,8 @@ export const UserStore = writable((browser && JSON.parse(localStorage.getItem("U
   defaults: {
     desktop: 0,
     mobile: 0,
-  }
+  },
+  first_visit: true,
 });
 
 UserStore.subscribe((val) => browser && (localStorage.UserStore = JSON.stringify(val)));
