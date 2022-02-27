@@ -5,8 +5,12 @@
 	import { UserStore } from '$lib/stores';
 	import { browser } from '$app/env';
 
-	const port = $page.params.port || $UserStore.port;
-	const { protocol, host, defaults } = $UserStore;
+	const portByURL = $page.params.port;
+	const port = portByURL || $UserStore.port;
+	let { protocol, host, defaults } = $UserStore;
+
+	protocol = portByURL ? 'http' : protocol;
+	host = portByURL ? 'localhost' : host;
 
 	let desktopDeviceSelection = desktopDevices[defaults.desktop];
 	let mobileDeviceSelection = mobileDevices[defaults.mobile];
