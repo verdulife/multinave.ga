@@ -1,17 +1,14 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
-	import { devices } from '$lib/devices';
+	import { desktopDevices, mobileDevices } from '$lib/devices';
+	import { UserStore } from '$lib/stores';
 
-	const { port } = $page.params;
+	const port = $page.params.port || $UserStore.port;
+	const { protocol, host, defaults } = $UserStore;
 
-	const desktopFilter = devices.filter((device) => device.type === 'desktop');
-	const tabletFilter = devices.filter((device) => device.type === 'tablet');
-	const mobileFilter = devices.filter((device) => device.type === 'mobile');
-	const desktopDevices = [...desktopFilter];
-	const mobileDevices = [...mobileFilter, ...tabletFilter];
-	let desktopDeviceSelection = desktopDevices[0];
-	let mobileDeviceSelection = mobileDevices[0];
+	let desktopDeviceSelection = desktopDevices[defaults.desktop];
+	let mobileDeviceSelection = mobileDevices[defaults.mobile];
 
 	let viewBoth = true;
 	let viewLeft = false;
@@ -147,7 +144,7 @@
 				width={desktopDeviceSelection.size.width}
 				height={desktopDeviceSelection.size.height}
 				title="desktop"
-				src="http://localhost:{port}"
+				src="{protocol}://{host}{port ? ':' : ''}{port}"
 				frameborder="0"
 			/>
 
@@ -172,7 +169,7 @@
 				width={mobileDeviceSelection.size.width}
 				height={mobileDeviceSelection.size.height}
 				title="mobile"
-				src="http://localhost:{port}"
+				src="{protocol}://{host}{port ? ':' : ''}{port}"
 				frameborder="0"
 			/>
 
@@ -238,17 +235,22 @@
 	iframe {
 		--frame-with-desktop: 20px;
 		--frame-with-mobile: calc(var(--frame-with-desktop) / 1.5);
+		--shadow-color: rgba(0, 0, 0, 0.8);
 
 		border-radius: 15px;
 
 		&[title='desktop'] {
-			box-shadow: 0 80px 80px -30px rgba(#000, 0.8), 0 0 0 var(--frame-with-desktop) #000,
-				0 0 0 calc(var(--frame-with-desktop) + 5px) #222;
+			box-shadow: 0 0 0 var(--frame-with-desktop) #000,
+				0 0 0 calc(var(--frame-with-desktop) + 5px) #222, 0 80px 80px -30px var(--shadow-color);
 		}
 
 		&[title='mobile'] {
-			box-shadow: 0 60px 60px -30px rgba(#000, 0.8), 0 0 0 var(--frame-with-mobile) #000,
-				0 0 0 calc(var(--frame-with-mobile) + 3px) #222;
+			box-shadow: 0 0 0 var(--frame-with-mobile) #000,
+				0 0 0 calc(var(--frame-with-mobile) + 3px) #222, 0 60px 60px -30px var(--shadow-color);
+		}
+
+		&:focus {
+			--shadow-color: rgba(45, 140, 240, 0.8);
 		}
 	}
 
