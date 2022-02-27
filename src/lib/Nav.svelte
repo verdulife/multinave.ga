@@ -206,8 +206,10 @@
 				}
 			}
 
-			.no-mobile {
-				display: none;
+			@media (max-width: 940px) {
+				.no-mobile {
+					display: none;
+				}
 			}
 		}
 
