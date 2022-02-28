@@ -1,9 +1,10 @@
 <script lang="ts">
 	import { page } from '$app/stores';
+	import { browser } from '$app/env';
 	import { onMount } from 'svelte';
 	import { desktopDevices, mobileDevices } from '$lib/devices';
 	import { UserStore } from '$lib/stores';
-	import { browser } from '$app/env';
+	import { popScreen } from '$lib/popscreen';
 
 	const portByURL = $page.params.port;
 	const port = portByURL || $UserStore.port;
@@ -159,7 +160,17 @@
 				frameborder="0"
 			/>
 
-			<div class="scale">Scale {desktopScale}%</div>
+			<div class="scale row jbetween acenter">
+				<p class="grow nowrap">Scale {desktopScale}%</p>
+
+				<button
+					class="col fcenter"
+					title="Window view with no scaling"
+					on:click={() => popScreen(window, desktopDeviceSelection, { protocol, host, port })}
+				>
+					<img src="/expand.svg" alt="Expand" />
+				</button>
+			</div>
 		</div>
 	{/if}
 
@@ -184,7 +195,17 @@
 				frameborder="0"
 			/>
 
-			<div class="scale">Scale {mobileScale}%</div>
+			<div class="scale row jbetween acenter">
+				<p class="grow nowrap">Scale {mobileScale}%</p>
+
+				<button
+					class="col fcenter"
+					title="Window view with no scaling"
+					on:click={() => popScreen(window, mobileDeviceSelection, { protocol, host, port })}
+				>
+					<img src="/expand.svg" alt="Expand" />
+				</button>
+			</div>
 		</div>
 	{/if}
 </section>
@@ -269,14 +290,38 @@
 		inset: auto auto 0 auto;
 		width: 150px;
 		background: rgba(#000, 0.6);
-		color: $grey;
-		font-size: 12px;
-		font-weight: bold;
-		text-align: center;
 		border: 1px solid #000;
 		border-radius: 10px 10px 0 0;
-		padding: 7px 14px;
-		pointer-events: none;
 		z-index: 1;
+
+		p {
+			color: $grey;
+			font-weight: bold;
+			font-size: 12px;
+			padding: 0 14px;
+			pointer-events: none;
+		}
+
+		button {
+			cursor: pointer;
+			width: 40px;
+			height: 40px;
+			box-shadow: -1px 0 0 $grey;
+			padding: 0;
+
+			&:hover {
+				transform: none;
+
+				img {
+					transform: scale(0.95);
+				}
+			}
+
+			img {
+				width: 15px;
+				height: 15px;
+				transition: 200ms;
+			}
+		}
 	}
 </style>
