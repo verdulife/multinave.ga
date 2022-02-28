@@ -16,7 +16,7 @@ export function popScreen(window, { name, size }, { protocol, host, port }) {
     <html>
       <head>
         <title>
-          ${name} (${size.width}x${size.width})
+          ${name} (${size.width}x${size.height})
         </title>
         <style>
           html, body {
