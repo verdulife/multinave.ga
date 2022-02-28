@@ -30,11 +30,11 @@
 		@import 'verdu/verdu.scss';
 
 		body {
-			background: #000 !important;
+			background: $pri;
 		}
 
 		main {
-			background: #111;
+			background: #151515;
 		}
 	}
 </style>

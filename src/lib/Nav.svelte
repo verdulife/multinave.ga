@@ -20,7 +20,11 @@
 				use <strong class="nowrap">/[your-localhost-port]</strong> after the URL.
 			</p>
 
-			<h-div style="margin: 30px 0; opacity: 0.3;" />
+			<p class="notice">
+				Shorthand overrides the default settings and use "http://localhost:[port]".
+			</p>
+
+			<h-div style="margin: 30px 0;" />
 
 			<div class="row jbetween xfill">
 				<h2>URL defaults</h2>
@@ -80,7 +84,7 @@
 				</select>
 			</div>
 
-			<h-div class="no-mobile" style="margin: 40px 0 -10px 0; opacity: 0.3" />
+			<h-div class="no-mobile" style="margin: 40px 0 -10px 0;" />
 
 			<h2 class="no-mobile">Key shortcuts</h2>
 
@@ -121,7 +125,8 @@
 			width: 400px;
 			max-width: 100vw;
 			height: 100vh;
-			background: rgba(#000, 0.99);
+			background: rgba($pri, 0.9);
+			backdrop-filter: blur(10px);
 			color: $sec;
 			padding: 30px;
 			opacity: 0;
@@ -169,14 +174,16 @@
 
 				input,
 				select {
+					background-color: rgba($pri, 0.6);
 					color: $white;
-					border: 1px solid #222;
+					border: 1px solid $border;
 					border-radius: 10px;
 				}
 
 				select {
 					cursor: pointer;
-					background: rgba(#000, 0.6) url('/arrow-down.svg') no-repeat;
+					background-image: url('/arrow-down.svg');
+					background-repeat: no-repeat;
 					background-size: auto 40%;
 					background-position: calc(100% - 10px) 55%;
 
@@ -198,7 +205,7 @@
 
 				kbd {
 					background: $white;
-					color: $grey;
+					color: $pri;
 					font-size: 12px;
 					padding: 2px 5px;
 					border-radius: 3px;

@@ -219,7 +219,7 @@
 	.right {
 		position: relative;
 		width: 35%;
-		box-shadow: inset 1px 0 0 0 #000;
+		box-shadow: inset 1px 0 0 0 $pri;
 	}
 
 	.monoscreen {
@@ -231,12 +231,12 @@
 		position: absolute;
 		inset: 0 auto auto auto;
 		width: 250px;
-		background: rgba(#000, 0.6) url('/arrow-down.svg') no-repeat;
+		background: rgba($pri, 0.6) url('/arrow-down.svg') no-repeat;
 		background-size: auto 40%;
 		background-position: calc(100% - 7px) center;
 		color: $sec;
 		font-weight: bold;
-		border: 1px solid #000;
+		border: 1px solid $border;
 		border-top: none;
 		border-radius: 0 0 10px 10px;
 		padding: 10px 20px;
@@ -271,13 +271,13 @@
 		border-radius: 15px;
 
 		&[title='desktop'] {
-			box-shadow: 0 0 0 var(--frame-with-desktop) #000,
-				0 0 0 calc(var(--frame-with-desktop) + 5px) #222, 0 80px 80px -30px var(--shadow-color);
+			box-shadow: 0 0 0 var(--frame-with-desktop) $pri,
+				0 0 0 calc(var(--frame-with-desktop) + 5px) $black, 0 80px 80px -30px var(--shadow-color);
 		}
 
 		&[title='mobile'] {
-			box-shadow: 0 0 0 var(--frame-with-mobile) #000,
-				0 0 0 calc(var(--frame-with-mobile) + 3px) #222, 0 60px 60px -30px var(--shadow-color);
+			box-shadow: 0 0 0 var(--frame-with-mobile) $pri,
+				0 0 0 calc(var(--frame-with-mobile) + 3px) $black, 0 60px 60px -30px var(--shadow-color);
 		}
 
 		&:focus {
@@ -289,13 +289,14 @@
 		position: absolute;
 		inset: auto auto 0 auto;
 		width: 150px;
-		background: rgba(#000, 0.6);
-		border: 1px solid #000;
+		background: rgba($pri, 0.6);
+		border: 1px solid $border;
+		border-bottom: none;
 		border-radius: 10px 10px 0 0;
 		z-index: 1;
 
 		p {
-			color: $grey;
+			color: $black;
 			font-weight: bold;
 			font-size: 12px;
 			padding: 0 14px;
@@ -306,7 +307,7 @@
 			cursor: pointer;
 			width: 40px;
 			height: 40px;
-			box-shadow: -1px 0 0 $grey;
+			box-shadow: -1px 0 0 $border;
 			padding: 0;
 
 			&:hover {

@@ -47,23 +47,34 @@
 	.outer {
 		cursor: pointer;
 		inset: 0;
-		background: rgba(#000, 0.5);
+		background: rgba($pri, 0.5);
 		backdrop-filter: blur(5px);
 	}
 
 	.modal {
-		top: 50%;
-		left: 50%;
-		transform: translate(-50%, -50%);
+		inset: 50% 0 auto 0;
+		transform: translateY(-50%);
+		margin: 0 auto;
+		width: 90%;
+		max-width: 700px;
 		background: #fff;
+		color: $pri;
 		text-align: center;
 		border-radius: 10px;
-		box-shadow: 0 80px 80px -30px rgba(#000, 0.8);
+		box-shadow: 0 80px 80px -30px rgba($pri, 0.8);
 		padding: 60px 40px;
+
+		@media (max-width: 940px) {
+			padding: 40px 20px;
+		}
 
 		h1 {
 			font-size: 40px;
 			margin-bottom: 20px;
+
+			@media (max-width: 940px) {
+				margin-bottom: 10px;
+			}
 		}
 
 		img {
@@ -74,6 +85,10 @@
 		p {
 			font-size: 20px;
 			margin-bottom: 20px;
+
+			@media (max-width: 940px) {
+				margin-bottom: 10px;
+			}
 		}
 
 		span {
