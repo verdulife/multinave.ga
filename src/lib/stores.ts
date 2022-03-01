@@ -1,15 +1,25 @@
-import { browser } from "$app/env";
-import { writable } from "svelte/store";
+import { browser } from '$app/env';
+import { writable } from 'svelte/store';
+import type { DeviceSelection } from '$lib/content/types';
 
-export const UserStore = writable((browser && JSON.parse(localStorage.getItem("UserStore"))) || {
-  protocol: "http",
-  host: "localhost",
-  port: "4000",
-  defaults: {
-    desktop: 0,
-    mobile: 0,
-  },
-  first_visit: true,
+let defaults: DeviceSelection;
+
+export const UserStore = writable(
+	(browser && JSON.parse(localStorage.getItem('UserStore'))) || {
+		protocol: 'http',
+		host: 'localhost',
+		port: '4000',
+		defaults: {
+			desktop: 0,
+			mobile: 0
+		},
+		first_visit: true
+	}
+);
+
+UserStore.subscribe((val) => {
+	browser && (localStorage.UserStore = JSON.stringify(val));
+	defaults = val.defaults;
 });
 
-UserStore.subscribe((val) => browser && (localStorage.UserStore = JSON.stringify(val)));
+export const deviceSelection = writable(defaults);

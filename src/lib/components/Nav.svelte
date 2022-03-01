@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { desktopDevices, mobileDevices } from '$lib/devices';
+	import { desktopDevices, mobileDevices } from '$lib/content/devices';
 	import { UserStore } from '$lib/stores';
 
 	function reload() {
-		window.location.reload(true);
+		window.location.reload();
 	}
 </script>
 
@@ -70,7 +70,9 @@
 				<label for="desktop">DESKTOP</label>
 				<select class="xfill" id="desktop" bind:value={$UserStore.defaults.desktop}>
 					{#each desktopDevices as device, i}
-						<option value={i}>{device.name}({device.size.width}x{device.size.height})</option>
+						<option value={i}>
+							{device.name}({device.size.width}x{device.size.height})
+						</option>
 					{/each}
 				</select>
 			</div>
@@ -79,7 +81,9 @@
 				<label for="mobile">MOBILE</label>
 				<select class="xfill" id="mobile" bind:value={$UserStore.defaults.mobile}>
 					{#each mobileDevices as device, i}
-						<option value={i}>{device.name}({device.size.width}x{device.size.height})</option>
+						<option value={i}>
+							{device.name}({device.size.width}x{device.size.height})
+						</option>
 					{/each}
 				</select>
 			</div>

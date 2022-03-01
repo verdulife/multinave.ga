@@ -1,8 +1,8 @@
-export function popScreen(window, { name, size }, { protocol, host, port }) {
-  const win = window.open(
-    '',
-    '',
-    `
+export function popScreen(window: Window, { name, size }, { protocol, host, port }) {
+	const win = window.open(
+		'',
+		'',
+		`
       width=${size.width},
       height=${size.height},
       toolbar=no,
@@ -10,9 +10,9 @@ export function popScreen(window, { name, size }, { protocol, host, port }) {
       top=20px,
       left=20px
     `
-  );
+	);
 
-  win.document.write(/* html */`
+	win.document.write(/* html */ `
     <html>
       <head>
         <title>

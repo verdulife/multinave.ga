@@ -2,19 +2,21 @@
 	import { page } from '$app/stores';
 	import { browser } from '$app/env';
 	import { onMount } from 'svelte';
-	import { desktopDevices, mobileDevices } from '$lib/devices';
-	import { UserStore } from '$lib/stores';
-	import { popScreen } from '$lib/popscreen';
+	import { UserStore, deviceSelection } from '$lib/stores';
+	import { scale } from '$lib/scripts/scale';
+	import { desktopDevices, mobileDevices } from '$lib/content/devices';
+
+	import Selector from '$lib/components/Selector.svelte';
+	import Scale from '$lib/components/Scale.svelte';
 
 	const portByURL = $page.params.port;
 	const port = portByURL || $UserStore.port;
-	let { protocol, host, defaults } = $UserStore;
+	let { protocol, host } = $UserStore;
+	$: desktopSelection = desktopDevices[$deviceSelection.desktop];
+	$: mobileSelection = mobileDevices[$deviceSelection.mobile];
 
 	protocol = portByURL ? 'http' : protocol;
 	host = portByURL ? 'localhost' : host;
-
-	let desktopDeviceSelection = desktopDevices[defaults.desktop];
-	let mobileDeviceSelection = mobileDevices[defaults.mobile];
 
 	let viewBoth: boolean = false;
 	let viewLeft: boolean = false;
@@ -28,53 +30,13 @@
 	let mobileContainer: HTMLElement;
 	let mobileFrame: HTMLIFrameElement;
 
-	$: desktop = desktopDeviceSelection.size;
-	$: mobile = mobileDeviceSelection.size;
-
 	let desktopScale: number;
 	let mobileScale: number;
 
-	function scale(container: HTMLElement, frame: HTMLIFrameElement): number {
-		const { clientWidth: containerWidth, clientHeight: containerHeight } = container;
-		const { clientWidth: frameWidth, clientHeight: frameHeight } = frame;
-
-		const containerRatio = containerWidth / containerHeight;
-		const frameRatio = frameWidth / frameHeight;
-		const ratio = containerRatio - frameRatio;
-		const padding: number = frameWidth > frameHeight ? 150 : 270;
-
-		if (viewRight) {
-			return (containerHeight - padding) / frameHeight;
-		}
-
-		if (frameHeight / ratio > containerHeight) {
-			return (containerHeight - padding) / frameHeight;
-		}
-
-		return (containerWidth - padding) / frameWidth;
-	}
-
-	function rotateDevice(device) {
-		if (device === 'desktop') {
-			const { width, height } = desktopDeviceSelection.size;
-
-			desktopDeviceSelection.size = {
-				width: height,
-				height: width
-			};
-		} else {
-			const { width, height } = mobileDeviceSelection.size;
-
-			mobileDeviceSelection.size = {
-				width: height,
-				height: width
-			};
-		}
-	}
-
 	let update: Function = () => {};
-	$: if (desktop || mobile) update();
-	$: if (desktopDeviceSelection || mobileDeviceSelection) update();
+
+	$: if ($deviceSelection) update();
+	$: if ($deviceSelection.desktop || $deviceSelection.mobile) update();
 
 	onMount(() => {
 		const isMobile = window.innerWidth <= 940;
@@ -86,49 +48,43 @@
 		}
 
 		update = () => {
-			if (desktopFrame !== null) {
-				desktopFrame.style.cssText = `
-					min-width: ${desktop.width}px;
-					max-width: ${desktop.width}px;
-					min-height: ${desktop.height}px;
-					max-height: ${desktop.height}px;
-					transform: scale(${scale(desktopContainer, desktopFrame)});
-				`;
+			const computedStyles = (device: string, container: HTMLElement, frame: HTMLIFrameElement) => `
+					min-width: ${(device === 'desktop' ? desktopSelection : mobileSelection).size.width}px;
+					max-width: ${(device === 'desktop' ? desktopSelection : mobileSelection).size.width}px;
+					min-height: ${(device === 'desktop' ? desktopSelection : mobileSelection).size.height}px;
+					max-height: ${(device === 'desktop' ? desktopSelection : mobileSelection).size.height}px;
+					transform: scale(${scale(viewRight, container, frame)});
+			`;
 
-				desktopScale = Math.floor(scale(desktopContainer, desktopFrame) * 100) - 100;
+			if (desktopFrame !== null) {
+				desktopFrame.style.cssText = computedStyles('desktop', desktopContainer, desktopFrame);
+				desktopScale = Math.floor(scale(viewRight, desktopContainer, desktopFrame) * 100) - 100;
 			}
 
 			if (mobileFrame !== null) {
-				mobileFrame.style.cssText = `
-					min-width: ${mobile.width}px;
-					max-width: ${mobile.width}px;
-					min-height: ${mobile.height}px;	
-					max-height: ${mobile.height}px;
-					transform: scale(${scale(mobileContainer, mobileFrame)});
-  			`;
-
-				mobileScale = Math.floor(scale(mobileContainer, mobileFrame) * 100) - 100;
+				mobileFrame.style.cssText = computedStyles('mobile', mobileContainer, mobileFrame);
+				mobileScale = Math.floor(scale(viewRight, mobileContainer, mobileFrame) * 100) - 100;
 			}
 		};
 
 		update();
 
-		function shortKeys(sk) {
-			if (sk.ctrlKey && sk.key === 'ArrowLeft') {
+		function shortKeys(e: KeyboardEvent) {
+			if (e.ctrlKey && e.key === 'ArrowLeft') {
 				if (viewLeft) return;
 				viewBoth = false;
 				viewLeft = true;
 				viewRight = false;
 			}
 
-			if (sk.ctrlKey && sk.key === 'ArrowRight') {
+			if (e.ctrlKey && e.key === 'ArrowRight') {
 				if (viewRight) return;
 				viewBoth = false;
 				viewLeft = false;
 				viewRight = true;
 			}
 
-			if (sk.ctrlKey && sk.key === ('ArrowUp' || 'ArrowDown')) {
+			if (e.ctrlKey && e.key === ('ArrowUp' || 'ArrowDown')) {
 				if (viewBoth) return;
 				viewBoth = true;
 				viewLeft = false;
@@ -137,75 +93,49 @@
 		}
 
 		window.addEventListener('keydown', shortKeys);
-		window.addEventListener('keyup', update);
-		window.addEventListener('resize', update);
+		window.addEventListener('keyup', () => update());
+		window.addEventListener('resize', () => update());
 	});
 </script>
 
 <section class="row fill">
 	{#if viewLeft || viewBoth}
 		<div bind:this={desktopContainer} class="left col fcenter yfill" class:monoscreen={viewLeft}>
-			<select bind:value={desktopDeviceSelection}>
-				{#each desktopDevices as device}
-					<option value={device}>{device.name} ({device.size.width}x{device.size.height})</option>
-				{/each}
-			</select>
+			<Selector from="desktop" />
 
 			<iframe
 				bind:this={desktopFrame}
-				width={desktopDeviceSelection.size.width}
-				height={desktopDeviceSelection.size.height}
+				width={desktopSelection.size.width}
+				height={desktopSelection.size.height}
 				title="desktop"
 				src="{protocol}://{host}{port ? ':' : ''}{port}"
 				frameborder="0"
 			/>
 
-			<div class="scale row jbetween acenter">
-				<p class="grow nowrap">Scale {desktopScale}%</p>
-
-				<button
-					class="col fcenter"
-					title="Window view with no scaling"
-					on:click={() => popScreen(window, desktopDeviceSelection, { protocol, host, port })}
-				>
-					<img src="/expand.svg" alt="Expand" />
-				</button>
-			</div>
+			<Scale scaleValue={desktopScale} url={{ device: 'desktop', protocol, host, port }} />
 		</div>
 	{/if}
 
 	{#if viewRight || viewBoth}
 		<div bind:this={mobileContainer} class="right col fcenter yfill" class:monoscreen={viewRight}>
-			<select bind:value={mobileDeviceSelection}>
-				{#each mobileDevices as device}
-					<option value={device}>{device.name} ({device.size.width}x{device.size.height})</option>
-				{/each}
-			</select>
-
-			<button class="rotate" on:click={() => rotateDevice('mobile')}>
-				<img src="/rotate.svg" alt="Rotate" />
-			</button>
+			<Selector from="mobile" />
 
 			<iframe
 				bind:this={mobileFrame}
-				width={mobileDeviceSelection.size.width}
-				height={mobileDeviceSelection.size.height}
+				width={mobileSelection.size.width}
+				height={mobileSelection.size.height}
 				title="mobile"
 				src="{protocol}://{host}{port ? ':' : ''}{port}"
 				frameborder="0"
 			/>
 
-			<div class="scale row jbetween acenter">
-				<p class="grow nowrap">Scale {mobileScale}%</p>
+			<Scale scaleValue={mobileScale} url={{ device: 'mobile', protocol, host, port }} />
+		</div>
+	{/if}
 
-				<button
-					class="col fcenter"
-					title="Window view with no scaling"
-					on:click={() => popScreen(window, mobileDeviceSelection, { protocol, host, port })}
-				>
-					<img src="/expand.svg" alt="Expand" />
-				</button>
-			</div>
+	{#if !viewBoth || !viewLeft || !viewRight}
+		<div class="row fcenter fill">
+			<img style="opacity: .3;" src="/loading.svg" alt="Loading" />
 		</div>
 	{/if}
 </section>
@@ -224,43 +154,6 @@
 
 	.monoscreen {
 		width: 100%;
-	}
-
-	select {
-		cursor: pointer;
-		position: absolute;
-		inset: 0 auto auto auto;
-		width: 250px;
-		background: rgba($pri, 0.6) url('/arrow-down.svg') no-repeat;
-		background-size: auto 40%;
-		background-position: calc(100% - 7px) center;
-		color: $sec;
-		font-weight: bold;
-		border: 1px solid $border;
-		border-top: none;
-		border-radius: 0 0 10px 10px;
-		padding: 10px 20px;
-		z-index: 1;
-
-		option {
-			background: $black;
-			color: $sec;
-		}
-	}
-
-	.rotate {
-		position: absolute;
-		top: 5px;
-		right: calc(50% - 160px);
-		width: 30px;
-		height: 30px;
-		padding: 2px;
-		z-index: 1;
-
-		img {
-			width: 100%;
-			height: 100%;
-		}
 	}
 
 	iframe {
@@ -282,47 +175,6 @@
 
 		&:focus {
 			--shadow-color: rgba(45, 140, 240, 0.8);
-		}
-	}
-
-	.scale {
-		position: absolute;
-		inset: auto auto 0 auto;
-		width: 150px;
-		background: rgba($pri, 0.6);
-		border: 1px solid $border;
-		border-bottom: none;
-		border-radius: 10px 10px 0 0;
-		z-index: 1;
-
-		p {
-			color: $black;
-			font-weight: bold;
-			font-size: 12px;
-			padding: 0 14px;
-			pointer-events: none;
-		}
-
-		button {
-			cursor: pointer;
-			width: 40px;
-			height: 40px;
-			box-shadow: -1px 0 0 $border;
-			padding: 0;
-
-			&:hover {
-				transform: none;
-
-				img {
-					transform: scale(0.95);
-				}
-			}
-
-			img {
-				width: 15px;
-				height: 15px;
-				transition: 200ms;
-			}
 		}
 	}
 </style>

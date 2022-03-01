@@ -1,9 +1,9 @@
 <script lang="ts">
 	import 'verdu/fonts/circular.css';
 	import 'verdu/fonts/operator.css';
-	import { message } from '$lib/message';
-	import Nav from '$lib/Nav.svelte';
-	import Tour from '$lib/Tour.svelte';
+	import { message } from '$lib/content/message';
+	import Nav from '$lib/components/Nav.svelte';
+	import Tour from '$lib/components/Tour.svelte';
 
 	console.log(
 		`%c\n\n${message}\n%cYour console.log() 👇\n`,
