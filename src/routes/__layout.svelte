@@ -1,9 +1,25 @@
+<script context="module">
+	export async function load({ fetch }) {
+		const req = await fetch('/api');
+		const res = await req.json();
+
+		return {
+			props: {
+				analytics: '👋 Visitor'
+			}
+		};
+	}
+</script>
+
 <script lang="ts">
 	import 'verdu/fonts/circular.css';
 	import 'verdu/fonts/operator.css';
 	import { message } from '$lib/content/message';
 	import Nav from '$lib/components/Nav.svelte';
 	import Tour from '$lib/components/Tour.svelte';
+
+	export let analytics;
+	console.log(analytics);
 
 	console.log(
 		`%c\n\n${message}\n%cYour console.log() 👇\n`,
