@@ -14,6 +14,7 @@
 	let { protocol, host } = $UserStore;
 	$: desktopSelection = desktopDevices[$deviceSelection.desktop];
 	$: mobileSelection = mobileDevices[$deviceSelection.mobile];
+	let rotateAction: boolean;
 
 	protocol = portByURL ? 'http' : protocol;
 	host = portByURL ? 'localhost' : host;
@@ -37,6 +38,7 @@
 
 	$: if ($deviceSelection) update();
 	$: if ($deviceSelection.desktop || $deviceSelection.mobile) update();
+	$: if (rotateAction) update();
 
 	onMount(() => {
 		const isMobile = window.innerWidth <= 940;
@@ -84,7 +86,14 @@
 				viewRight = true;
 			}
 
-			if (e.ctrlKey && e.key === ('ArrowUp' || 'ArrowDown')) {
+			if (e.ctrlKey && e.key === 'ArrowUp') {
+				if (viewBoth) return;
+				viewBoth = true;
+				viewLeft = false;
+				viewRight = false;
+			}
+
+			if (e.ctrlKey && e.key === 'ArrowDown') {
 				if (viewBoth) return;
 				viewBoth = true;
 				viewLeft = false;
@@ -101,7 +110,7 @@
 <section class="row fill">
 	{#if viewLeft || viewBoth}
 		<div bind:this={desktopContainer} class="left col fcenter yfill" class:monoscreen={viewLeft}>
-			<Selector from="desktop" />
+			<Selector bind:rotateAction bind:mobileSelection from="desktop" />
 
 			<iframe
 				bind:this={desktopFrame}
@@ -118,7 +127,7 @@
 
 	{#if viewRight || viewBoth}
 		<div bind:this={mobileContainer} class="right col fcenter yfill" class:monoscreen={viewRight}>
-			<Selector from="mobile" />
+			<Selector bind:rotateAction bind:mobileSelection from="mobile" />
 
 			<iframe
 				bind:this={mobileFrame}

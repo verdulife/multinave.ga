@@ -1,22 +1,25 @@
 <script lang="ts">
-	import { desktopDevices, mobileDevices } from '$lib/content/devices';
 	import { deviceSelection } from '$lib/stores';
+	import { desktopDevices, mobileDevices } from '$lib/content/devices';
+	/* 	import { rotateScreen } from '$lib/scripts/rotatescreen'; */
+	import type { Device } from '$lib/types';
 
+	export let mobileSelection: Device;
 	export let from: string;
+	export let rotateAction: boolean;
 
-	let deviceList = from === 'desktop' ? desktopDevices : mobileDevices;
+	function rotateScreen(device: Device) {
+		const { width, height } = device.size;
 
-	function rotateDevice() {
-		alert('Coming soon!');
-		/* console.log(readMobileSelection);
-
-		const { width, height } = readMobileSelection.size;
-
-		readMobileSelection.size = {
+		device.size = {
 			width: height,
 			height: width
-		}; */
+		};
+
+		rotateAction = true;
 	}
+
+	let deviceList = from === 'desktop' ? desktopDevices : mobileDevices;
 </script>
 
 <div class="sizes row jbetween acenter">
@@ -27,7 +30,7 @@
 	</select>
 
 	{#if from === 'mobile'}
-		<button class="col fcenter" on:click={rotateDevice}>
+		<button class="col fcenter" on:click={() => rotateScreen(mobileSelection)}>
 			<img src="/rotate.svg" alt="Rotate" />
 		</button>
 	{/if}

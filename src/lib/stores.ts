@@ -1,6 +1,6 @@
 import { browser } from '$app/env';
 import { writable } from 'svelte/store';
-import type { DeviceSelection } from '$lib/content/types';
+import type { DeviceSelection } from '$lib/types';
 
 let defaults: DeviceSelection;
 
